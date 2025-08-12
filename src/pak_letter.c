@@ -1,6 +1,9 @@
 #include "pak_letter.h"
 
 #include <stdio.h>
+#include <string.h>
+
+#include <libdragon.h>
 
 /* A character using the game's special encoding */
 typedef unsigned char dnm_char;
@@ -95,7 +98,7 @@ int pak_write_letter(void)
     FILE *file;
     dnm_mailbox_t mailbox;
     unsigned short checksum = 0;
-    int i;
+    unsigned i;
 
     /* Initialize mailbox */
     memset(&mailbox, 0x20, sizeof(mailbox));
@@ -103,7 +106,7 @@ int pak_write_letter(void)
     memcpy(&mailbox.letters[0], &FAMICOM_LETTER, sizeof(FAMICOM_LETTER));
 
     /* Compute mailbox checksum */
-    for (i = 0; i < sizeof(mailbox) - sizeof(mailbox.checksum); i++)
+    for (i = 2; i < sizeof(mailbox); i++)
       checksum += ((unsigned char*)&mailbox)[i];
     mailbox.checksum = checksum;
 
@@ -125,4 +128,6 @@ int pak_write_letter(void)
 
     return 0;
   }
+
+  return -1;
 }

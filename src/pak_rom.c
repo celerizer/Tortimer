@@ -199,7 +199,7 @@ static void cpn_format(char *dst, const char *src, size_t len)
       else
         last_char_was_space = 0;
 
-        temp_path[j++] = c;
+      temp_path[j++] = c;
     }
     else
     {
@@ -211,7 +211,6 @@ static void cpn_format(char *dst, const char *src, size_t len)
       }
     }
   }
-  temp_path[j] = '\0';
 
   /* Remove trailing space if present */
   if (j > 0 && temp_path[j - 1] == ' ')
@@ -234,7 +233,7 @@ static nesinfo_cpn_t nesinfo_cpn(const char *name)
 
   /* Convert to CPN format */
   for (i = 0; i < 16; i++)
-    cpn.data[i] = ascii2cpn((char*)cpn.data[i]);
+    cpn.data[i] = ascii2cpn((char)cpn.data[i]);
 
   return cpn;
 }
@@ -248,7 +247,6 @@ static nesinfo_t nesinfo_generate(const char *name, unsigned size)
 {
   nesinfo_t info;
   nesinfo_cpn_t cpn = nesinfo_cpn(name);
-  unsigned i;
 
   memset(&info, 0, sizeof(info));
   memcpy(info.header.magic1, "NESINFO", sizeof(info.header.magic1));
@@ -289,7 +287,7 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
     write_data = (unsigned char*)malloc(size);
     if (!write_data)
       return -2;
-    if (yay0_compress(data, size, write_data, &write_size) != YAY0_OK)
+    if (yay0_compress(data, size, &write_data, &write_size) != YAY0_OK)
     {
       free(write_data);
       return -3;
@@ -304,7 +302,6 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
   {
     FILE *file;
     char filename[64], formatted_name[32];
-    int i;
 
     /* Open Controller Pak file */
     cpn_format(formatted_name, name, strlen(name));
@@ -336,4 +333,6 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
 
     return 0;
   }
+
+  return -1;
 }
