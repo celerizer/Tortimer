@@ -1,5 +1,6 @@
 #include "pak_rom.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -301,11 +302,13 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
   if (!cpak_mount(JOYPAD_PORT_1, "cpak1:/"))
   {
     FILE *file;
+    cpak_stats_t stats;
     char filename[64], formatted_name[32];
+    size_t bytes_written = 0;
 
     /* Open Controller Pak file */
     cpn_format(formatted_name, name, strlen(name));
-    snprintf(filename, sizeof(filename), "cpak:/NAFJ.01/%s.", formatted_name);
+    snprintf(filename, sizeof(filename), "cpak1:/NAFJ.01/%s.", formatted_name);
     file = fopen(filename, "wb");
     if (!file)
     {
@@ -316,9 +319,12 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
     }
 
     /* Write ROM data to Controller Pak */
-    if (fwrite(nesinfo_data, 1, nesinfo_size, file) != nesinfo_size ||
-        fwrite(write_data, 1, write_size, file) != write_size)
+    bytes_written += fwrite(nesinfo_data, 1, nesinfo_size, file);
+    bytes_written += fwrite(write_data, 1, write_size, file);
+    if (bytes_written != nesinfo_size + write_size)
     {
+      printf("Wrote %u, expected %u: %s\n", bytes_written,
+        nesinfo_size + write_size, strerror(errno));
       fclose(file);
       cpak_unmount(JOYPAD_PORT_1);
       if (compress)
@@ -327,6 +333,11 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
     }
     fclose(file);
 
+    cpak_get_stats(JOYPAD_PORT_1, &stats);
+    printf("ROM successfully saved to Controller Pak.\n");
+    printf("Bytes written: %u\n", bytes_written);
+    printf("Pages used: %i\n", stats.pages.used);
+    printf("Notes used: %i\n", stats.notes.used);
     cpak_unmount(JOYPAD_PORT_1);
     if (compress)
       free(write_data);
