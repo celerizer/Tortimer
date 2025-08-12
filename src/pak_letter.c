@@ -1,5 +1,6 @@
 #include "pak_letter.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -40,7 +41,7 @@ typedef struct
 
 static const dnm_char FAMICOM_BOX_NAMES[8][10] =
 {
-  { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 },
+  { 0x0C, 0x0C, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 },
   { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 },
   { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 },
   { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 },
@@ -96,7 +97,9 @@ int pak_write_letter(void)
   else if (!cpak_mount(JOYPAD_PORT_1, "cpak1:/"))
   {
     FILE *file;
+    cpak_stats_t stats;
     dnm_mailbox_t mailbox;
+    size_t bytes_written;
     unsigned short checksum = 0;
     unsigned i;
 
@@ -111,19 +114,28 @@ int pak_write_letter(void)
     mailbox.checksum = checksum;
 
     /* Write mailbox to Controller Pak */
-    file = fopen("cpak:/NAFJ.01/DOUBUTSUNOMORI.B", "wb");
+    file = fopen("cpak1:/NAFJ.01/DOUBUTSUNOMORI.B", "wb");
     if (!file)
     {
       cpak_unmount(JOYPAD_PORT_1);
+      printf("Failed to open Controller Pak file: %s\n", strerror(errno));
       return -2;
     }
-    if (fwrite(&mailbox, sizeof(mailbox), 1, file) != 1)
+    bytes_written = fwrite(&mailbox, 1, sizeof(mailbox), file);
+    if (bytes_written != sizeof(mailbox))
     {
       fclose(file);
       cpak_unmount(JOYPAD_PORT_1);
+      printf("Failed to write to Controller Pak file: %s\n", strerror(errno));
       return -3;
     }
     fclose(file);
+
+    cpak_get_stats(JOYPAD_PORT_1, &stats);
+    printf("Letter successfully saved to Controller Pak.\n");
+    printf("Bytes written: %u\n", bytes_written);
+    printf("Pages used: %i\n", stats.pages.used);
+    printf("Notes used: %i\n", stats.notes.used);
     cpak_unmount(JOYPAD_PORT_1);
 
     return 0;
