@@ -1,0 +1,3 @@
+[submodule "src/yay0tool"]
+	path = src/yay0tool
+	url = https://github.com/celerizer/yay0tool
