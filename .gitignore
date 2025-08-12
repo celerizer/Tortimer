@@ -1,2 +1,14 @@
 *.d
 *.o
+*.z64
+*.pak
+*.nes
+*.eeprom
+*.map
+*.sym
+*.stripped
+*.elf
+*.dfs
+*.bs1
+*.flash
+*.rtc
