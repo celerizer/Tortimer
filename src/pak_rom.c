@@ -292,17 +292,26 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
   if (size == 0 || !data)
     return -1;
 
+  printf("Writing ROM data to Controller Pak: %s (%u bytes)\n", name, size);
+
   /* Compress the ROM if requested */
   if (compress)
   {
+    int result;
+
+    printf("Compressing ROM data to Yay0...\n");
     write_data = (unsigned char*)malloc(size);
     if (!write_data)
       return -2;
-    if (yay0_compress(data, size, &write_data, &write_size) != YAY0_OK)
+    result = yay0_compress(data, size, &write_data, &write_size);
+    if (result != YAY0_OK)
     {
+      printf("Failed to compress ROM data: %d\n", result);
       free(write_data);
-      return -3;
+      return result;
     }
+    else
+      printf("ROM data compressed. (%u -> %u)\n", size, write_size);
   }
 
   /* Generate NESINFO */
