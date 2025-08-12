@@ -59,6 +59,7 @@ int main(void)
   printf("R: Write sd:/nes/rom.nes to Pak\n");
   printf("B: Write sd:/nes/rom.nes to Pak without compression\n");
   printf("Z: Write rom:/roms/rom.nes to Pak\n\n");
+  printf("A: Write rom:/roms/rom.nes to Pak without compression\n");
 
   while (64)
   {
@@ -90,6 +91,12 @@ int main(void)
     {
       size = load_file(rom_data, ROM_SIZE, "rom:/roms/rom.nes");
       result = pak_write_rom(rom_data, size, "rom", 1);
+      finished = 1;
+    }
+    else if (buttons.a)
+    {
+      size = load_file(rom_data, ROM_SIZE, "rom:/roms/rom.nes");
+      result = pak_write_rom(rom_data, size, "rom", 0);
       finished = 1;
     }
 
