@@ -9,7 +9,7 @@
 /* A character using the game's special encoding */
 typedef unsigned char dnm_char;
 
-typedef struct pak_letter
+typedef struct
 {
   dnm_char name[6];
   dnm_char town[6];
