@@ -248,6 +248,7 @@ static nesinfo_t nesinfo_generate(const char *name, unsigned size)
 {
   nesinfo_t info;
   nesinfo_cpn_t cpn = nesinfo_cpn(name);
+  unsigned i;
 
   memset(&info, 0, sizeof(info));
   memcpy(info.header.magic1, "NESINFO", sizeof(info.header.magic1));
@@ -266,6 +267,15 @@ static nesinfo_t nesinfo_generate(const char *name, unsigned size)
   memset(info.tags[1].data, 0, nesinfo_tags[NESINFO_TAG_END].maximum_length);
 
   info.tag_count = 2;
+
+  /* Calculate NESINFO size */
+  info.header.info_size = 0;
+  for (i = 0; i < info.tag_count; i++)
+  {
+    info.header.info_size += sizeof(info.tags[i].id);
+    info.header.info_size += sizeof(info.tags[i].size);
+    info.header.info_size += info.tags[i].size;
+  }
 
   return info;
 }
