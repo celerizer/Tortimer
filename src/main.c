@@ -58,8 +58,8 @@ int main(void)
   printf("L: Write letter data to Pak\n");
   printf("R: Write sd:/nes/rom.nes to Pak\n");
   printf("B: Write sd:/nes/rom.nes to Pak without compression\n");
-  printf("Z: Write rom:/roms/rom.nes to Pak\n\n");
-  printf("A: Write rom:/roms/rom.nes to Pak without compression\n");
+  printf("Z: Write rom:/roms/rom.nes to Pak\n");
+  printf("A: Write rom:/roms/rom.nes to Pak without compression\n\n");
 
   while (64)
   {
