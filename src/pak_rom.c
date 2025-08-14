@@ -17,7 +17,10 @@ typedef enum
   NESINFO_TAG_VERSION_NOT_EQUAL,
   NESINFO_TAG_GAME_ID,
   NESINFO_TAG_GAME_NAME,
+
+  /* Name of Controller Pak note, in Controller Pak note encoding */
   NESINFO_TAG_CONTROLLER_PAK_NAME,
+
   NESINFO_TAG_OFFSET,
   NESINFO_TAG_HIGH_SCORES,
   NESINFO_TAG_GAME_NUMBER,
@@ -26,7 +29,10 @@ typedef enum
   NESINFO_TAG_SPECIAL,
   NESINFO_TAG_TAGS_CHECKSUM,
   NESINFO_TAG_IMAGE_CHECKSUM,
+
+  /* Size of Yay0 file once decompressed */
   NESINFO_TAG_EXPANDED_SIZE,
+
   NESINFO_TAG_ROM_DATA_REFERENCE,
   NESINFO_TAG_MOVE_DATA,
   NESINFO_TAG_NES_HEADER_DATA,
@@ -56,21 +62,21 @@ const nesinfo_tag_format_t nesinfo_tags[NESINFO_TAG_SIZE] =
 {
   { NESINFO_TAG_INVALID, 0, 0, 0, "" },
 
-  { NESINFO_TAG_END,                  1, 2, 2, "END" },
+  { NESINFO_TAG_END,                  1, 0, 0xFF, "END" },
   { NESINFO_TAG_VERSION_EQUALS,       0, 1, 1, "VEQ" },
   { NESINFO_TAG_VERSION_NOT_EQUAL,    0, 1, 1, "VNE" },
-  { NESINFO_TAG_GAME_ID,              0, 1, 0xFF, "GID" },  // char[]
-  { NESINFO_TAG_GAME_NAME,            0, 1, 0xFF, "GNM" },  // char[]
-  { NESINFO_TAG_CONTROLLER_PAK_NAME,  1, 16, 16, "CPN" }, /* Name of Controller Pak note, in cpak encoding */
+  { NESINFO_TAG_GAME_ID,              0, 1, 0xFF, "GID" },
+  { NESINFO_TAG_GAME_NAME,            0, 1, 0xFF, "GNM" },
+  { NESINFO_TAG_CONTROLLER_PAK_NAME,  1, 16, 16, "CPN" },
   { NESINFO_TAG_OFFSET,               0, 2, 2, "OFS" },
-  { NESINFO_TAG_HIGH_SCORES,          0, 3, 0xFF, "HSC" },  // ushort + char[]
+  { NESINFO_TAG_HIGH_SCORES,          0, 3, 0xFF, "HSC" },
   { NESINFO_TAG_GAME_NUMBER,          0, 1, 1, "GNO" },
-  { NESINFO_TAG_BATTERY_BACKUP,       0, 4, 4, "BBR" },  // ushort + ushort
-  { NESINFO_TAG_QUICK_DISK_SAVE,      0, 5, 5, "QDS" },  // byte + ushort + ushort
-  { NESINFO_TAG_SPECIAL,              0, 0, 0, "SPE" },  // special patch, no args listed
+  { NESINFO_TAG_BATTERY_BACKUP,       0, 4, 4, "BBR" },
+  { NESINFO_TAG_QUICK_DISK_SAVE,      0, 5, 5, "QDS" },
+  { NESINFO_TAG_SPECIAL,              0, 0, 0, "SPE" },
   { NESINFO_TAG_TAGS_CHECKSUM,        0, 2, 2, "TCS" },
   { NESINFO_TAG_IMAGE_CHECKSUM,       0, 2, 2, "ICS" },
-  { NESINFO_TAG_EXPANDED_SIZE,        0, 2, 2, "ESZ" },
+  { NESINFO_TAG_EXPANDED_SIZE,        1, 2, 2, "ESZ" },
   { NESINFO_TAG_ROM_DATA_REFERENCE,   0, 1, 1, "ROM" },
   { NESINFO_TAG_MOVE_DATA,            0, 6, 6, "MOV" },
   { NESINFO_TAG_NES_HEADER_DATA,      0, 1, 0x10, "NHD" },
@@ -242,31 +248,45 @@ static nesinfo_cpn_t nesinfo_cpn(const char *name)
 /**
  * Generate NESINFO for the ROM data.
  * @param name Name of the ROM.
- * @param size Size of the uncompressed ROM data.
+ * @param cmp_size Size of the compressed ROM data, or 0 if not compressed.
+ * @param raw_size Size of the decompressed ROM data.
  */
-static nesinfo_t nesinfo_generate(const char *name, unsigned size)
+static nesinfo_t nesinfo_generate(const char *name, unsigned cmp_size,
+  unsigned raw_size)
 {
   nesinfo_t info;
   nesinfo_cpn_t cpn = nesinfo_cpn(name);
+  nesinfo_tag_t *tag = &info.tags[0];
   unsigned i;
 
   memset(&info, 0, sizeof(info));
   memcpy(info.header.magic1, "NESINFO", sizeof(info.header.magic1));
   info.header.magic2 = 0x1A; /* Arbitrary magic byte? */
-  info.header.info_size = sizeof(nesinfo_header_t) + sizeof(nesinfo_tag_t);
-  info.header.rom_size = size;
+  info.header.rom_size = cmp_size ? cmp_size : raw_size;
+  info.tag_count = 0;
 
   /* CPN tag */
-  memcpy(info.tags[0].id, nesinfo_tags[NESINFO_TAG_CONTROLLER_PAK_NAME].name, 3);
-  info.tags[0].size = sizeof(nesinfo_cpn_t);
-  memcpy(info.tags[0].data, &cpn, sizeof(cpn));
+  memcpy(tag->id, nesinfo_tags[NESINFO_TAG_CONTROLLER_PAK_NAME].name, 3);
+  tag->size = sizeof(nesinfo_cpn_t);
+  memcpy(tag->data, &cpn, sizeof(cpn));
+  tag++; info.tag_count++;
+
+  /* ESZ tag */
+  if (cmp_size && cmp_size < raw_size)
+  {
+    unsigned short value = raw_size >> 4;
+
+    memcpy(tag->id, nesinfo_tags[NESINFO_TAG_EXPANDED_SIZE].name, 3);
+    tag->size = nesinfo_tags[NESINFO_TAG_EXPANDED_SIZE].minimum_length;
+    memcpy(tag->data, &value, sizeof(value));
+    tag++; info.tag_count++;
+  }
 
   /* END tag */
-  memcpy(info.tags[1].id, nesinfo_tags[NESINFO_TAG_END].name, 3);
-  info.tags[1].size = nesinfo_tags[NESINFO_TAG_END].maximum_length;
-  memset(info.tags[1].data, 0, nesinfo_tags[NESINFO_TAG_END].maximum_length);
-
-  info.tag_count = 2;
+  memcpy(tag->id, nesinfo_tags[NESINFO_TAG_END].name, 3);
+  tag->size = 2; /** @todo: is this used to align? */
+  memset(tag->data, 0, tag->size);
+  tag++; info.tag_count++;
 
   /* Calculate NESINFO size */
   info.header.info_size = 0;
@@ -315,7 +335,7 @@ int pak_write_rom(unsigned char *data, size_t size, const char *name,
   }
 
   /* Generate NESINFO */
-  nesinfo = nesinfo_generate(name, size);
+  nesinfo = nesinfo_generate(name, write_size, size);
   nesinfo_encode(&nesinfo, nesinfo_data, &nesinfo_size);
 
   if (!cpakfs_mount(JOYPAD_PORT_1, "cpak1:/"))
