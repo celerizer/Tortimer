@@ -1,14 +1,28 @@
-**WORK IN PROGRESS** -- Yay0 compression is broken right now
+**WORK IN PROGRESS**
 
 # Tortimer
 
 **Tortimer** is a homebrew program for the Nintendo 64 that allows for transferring NES games from the SD Card to a Controller Pak for use in *Doubutsu no Mori* (Animal Forest).
 
-In *Doubutsu no Mori*, players can obtain a special in-game *Famicom* furniture item. When interacted with, this item scans the inserted Controller Pak for specially formatted NES ROM files. If a valid file is detected, the game launches it using its built-in NES emulator, *ksNes*. The ROMs must conform to a specific file structure expected by *Doubutsu no Mori*, and they may optionally be stored using Nintendo’s Yay0 compression format to reduce file size. *Tortimer* can send the *Famicom* item to the Controller Pak to be retrieved at the post office in-game, as well as generate Controller Pak notes containing NES ROMs using the proper NESINFO header and Yay0 compression.
+In *Doubutsu no Mori*, players can obtain a special in-game *Disk System* furniture item. When interacted with, this item scans the inserted Controller Pak for specially formatted NES ROM files. If a valid file is detected, the game launches it using its built-in NES emulator, *ksNes*.
+
+This project has two functions: it can send the *Disk System* item to the Controller Pak to be retrieved at the post office in-game, as well as generate Controller Pak notes containing NES ROMs using Nintendo's custom NESINFO header and Yay0 compression.
+
+# Usage
+
+1. Be sure you have progressed into *Doubutsu no Mori* to the point where your character's part time job is finished.
+2. Open Tortimer and select the option to send the Disk System letter data to your Controller Pak.
+3. Return to *Doubutsu no Mori* and visit the post office. Choose the third option to open letter data from the Controller Pak. The letter within should contain the Disk System item which can be placed in your house.
+4. Open Tortimer and select an NES ROM to send to the Controller Pak.
+5. Return to *Doubutsu no Mori* and interact with the Disk System item in your house. The game should find the NES ROM on your Controller Pak and ask if you would like to play it.
+
+From this point on, steps 4 and 5 can be repeated indefinitely so long as you keep the Disk System item.
 
 # Supported games
 
-This is a list of NES games that should fit on a standard Controller Pak. This list is not all-inclusive, and it does not guarantee the games will run correctly, just that they will fit.
+Virtually any NES ROM can be sent to the Controller Pak so long as there is space for it, though official Controller Paks only support ROMs that fit within 123 "pages." Tortimer supports Nintendo's Yay0 compression algorithm, which expands the number of possible supported games. Modified Controller Paks or the Ares emulator can be used play even larger NES ROMs.
+
+This is a list of NES games that should fit on a standard Controller Pak. This list is not all-inclusive, and it does not guarantee the games will run correctly, just that they will fit:
 
 | Filename | Raw size | Compressed size | Needs compression |
 |----------|----------|-----------------|-----------|
@@ -24,7 +38,6 @@ This is a list of NES games that should fit on a standard Controller Pak. This l
 | Banana (Japan) | 49168 (193 pages) | 30148 (118 pages) | ✔ |
 | Baseball (USA, Europe) | 24592 (97 pages) | 19381 (76 pages) | |
 | BattleCity (Japan) | 24592 (97 pages) | 17488 (69 pages) | |
-| Battleship (USA) | 65552 (257 pages) | 32180 (126 pages) | ✔ |
 | Binary Land (Japan) | 24592 (97 pages) | 12737 (50 pages) | |
 | Bird Week (Japan) | 24592 (97 pages) | 18380 (72 pages) | |
 | Bokosuka Wars (Japan) | 40976 (161 pages) | 21017 (83 pages) | ✔ |
@@ -37,7 +50,6 @@ This is a list of NES games that should fit on a standard Controller Pak. This l
 | Choujikuu Yousai - Macross (Japan) | 24592 (97 pages) | 18407 (72 pages) | |
 | Chubby Cherub (USA) | 40976 (161 pages) | 27172 (107 pages) | ✔ |
 | Circus Charlie (Japan) | 24592 (97 pages) | 19811 (78 pages) | |
-| City Connection (USA) | 65552 (257 pages) | 32617 (128 pages) | ✔ |
 | Clu Clu Land (World) | 24592 (97 pages) | 18588 (73 pages) | |
 | Defender II (USA) | 24592 (97 pages) | 14883 (59 pages) | |
 | Devil World (Europe) | 24592 (97 pages) | 18908 (74 pages) | |
@@ -52,7 +64,6 @@ This is a list of NES games that should fit on a standard Controller Pak. This l
 | Dough Boy (Japan) | 40976 (161 pages) | 27430 (108 pages) | ✔ |
 | Druaga no Tou (Japan) | 40976 (161 pages) | 27561 (108 pages) | ✔ |
 | Duck Hunt (World) | 24592 (97 pages) | 18248 (72 pages) | |
-| Dynamite Bowl (Japan) (Rev 1) | 65552 (257 pages) | 31595 (124 pages) | ✔ |
 | Elevator Action (USA) | 40976 (161 pages) | 25341 (99 pages) | ✔ |
 | Excitebike (Japan, USA) (En) | 24592 (97 pages) | 20062 (79 pages) | |
 | Exerion (Japan) (En) | 24592 (97 pages) | 15806 (62 pages) | |
@@ -75,7 +86,6 @@ This is a list of NES games that should fit on a standard Controller Pak. This l
 | Hydlide (USA) | 40976 (161 pages) | 25942 (102 pages) | ✔ |
 | Hyper Sports (Japan) (Rev 1) | 24592 (97 pages) | 20201 (79 pages) | |
 | Ice Climber (USA, Europe, Korea) (En) | 24592 (97 pages) | 20710 (81 pages) | |
-| Ice Hockey (USA) | 40976 (161 pages) | 31753 (125 pages) | ✔ |
 | Igo - Kyuu Roban Taikyoku (Japan) | 49168 (193 pages) | 29474 (116 pages) | ✔ |
 | Igo Meikan (Japan) | 40976 (161 pages) | 28922 (113 pages) | ✔ |
 | Ikinari Musician (Japan) | 49168 (193 pages) | 26965 (106 pages) | ✔ |
