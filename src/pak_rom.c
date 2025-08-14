@@ -280,14 +280,14 @@ static nesinfo_t nesinfo_generate(const char *name, unsigned size)
   return info;
 }
 
-int pak_write_rom(unsigned char *data, unsigned size, const char *name,
+int pak_write_rom(unsigned char *data, size_t size, const char *name,
   int compress)
 {
   nesinfo_t nesinfo;
   unsigned char nesinfo_data[64];
-  unsigned nesinfo_size;
+  size_t nesinfo_size;
   unsigned char *write_data = data;
-  unsigned write_size = size;
+  size_t write_size = size;
 
   if (size == 0 || !data)
     return -1;
@@ -318,20 +318,33 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
   nesinfo = nesinfo_generate(name, size);
   nesinfo_encode(&nesinfo, nesinfo_data, &nesinfo_size);
 
-  if (!cpak_mount(JOYPAD_PORT_1, "cpak1:/"))
+  if (!cpakfs_mount(JOYPAD_PORT_1, "cpak1:/"))
   {
     FILE *file;
-    cpak_stats_t stats;
+    cpakfs_stats_t stats;
     char filename[64], formatted_name[32];
     size_t bytes_written = 0;
 
+#if 1
+    if (cpakfs_format(JOYPAD_PORT_1, true))
+    {
+      printf("Failed to format Pak: %s\n", strerror(errno));
+      return -1;
+    }
+    else
+    {
+      cpakfs_get_stats(JOYPAD_PORT_1, &stats);
+      printf("Pak formatted, %i pages available\n", stats.pages.total);
+    }
+#endif
+
     /* Open Controller Pak file */
     cpn_format(formatted_name, name, strlen(name));
-    snprintf(filename, sizeof(filename), "cpak1:/NAFJ.01/%s.", formatted_name);
+    snprintf(filename, sizeof(filename), "cpak1:/NAFJ.01/%s", formatted_name);
     file = fopen(filename, "wb");
     if (!file)
     {
-      cpak_unmount(JOYPAD_PORT_1);
+      cpakfs_unmount(JOYPAD_PORT_1);
       if (compress)
         free(write_data);
       return -4;
@@ -345,19 +358,19 @@ int pak_write_rom(unsigned char *data, unsigned size, const char *name,
       printf("Wrote %u, expected %u: %s\n", bytes_written,
         nesinfo_size + write_size, strerror(errno));
       fclose(file);
-      cpak_unmount(JOYPAD_PORT_1);
+      cpakfs_unmount(JOYPAD_PORT_1);
       if (compress)
         free(write_data);
       return -5;
     }
     fclose(file);
 
-    cpak_get_stats(JOYPAD_PORT_1, &stats);
+    cpakfs_get_stats(JOYPAD_PORT_1, &stats);
     printf("ROM successfully saved to Controller Pak.\n");
     printf("Bytes written: %u\n", bytes_written);
     printf("Pages used: %i\n", stats.pages.used);
     printf("Notes used: %i\n", stats.notes.used);
-    cpak_unmount(JOYPAD_PORT_1);
+    cpakfs_unmount(JOYPAD_PORT_1);
     if (compress)
       free(write_data);
 

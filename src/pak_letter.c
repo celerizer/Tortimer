@@ -135,14 +135,22 @@ int pak_write_letter(void)
     printf("Critical error: mailbox structures aren't the right size!\n");
     return -1;
   }
-  else if (!cpak_mount(JOYPAD_PORT_1, "cpak1:/"))
+  else if (!cpakfs_mount(JOYPAD_PORT_1, "cpak1:/"))
   {
     FILE *file;
-    cpak_stats_t stats;
+    cpakfs_stats_t stats;
     dnm_mailbox_t mailbox;
     size_t bytes_written;
     unsigned short checksum = 0;
     unsigned i;
+
+    if (cpakfs_format(JOYPAD_PORT_1, true))
+      printf("Failed to format Pak: %s\n", strerror(errno));
+    else
+    {
+      cpakfs_get_stats(JOYPAD_PORT_1, &stats);
+      printf("Pak formatted, %i pages available\n", stats.pages.total);
+    }
 
     /* Initialize mailbox */
     for (i = 1; i < sizeof(mailbox.letters) / sizeof(dnm_letter_t); i++)
@@ -157,30 +165,33 @@ int pak_write_letter(void)
     mailbox.checksum = checksum;
     printf("Mailbox checksum: %04X\n", checksum);
 
-    /* Write mailbox to Controller Pak */
+    /* Open file on Controller Pak */
     file = fopen("cpak1:/NAFJ.01/DOUBUTSUNOMORI.B", "wb");
     if (!file)
     {
-      cpak_unmount(JOYPAD_PORT_1);
+      cpakfs_unmount(JOYPAD_PORT_1);
       printf("Failed to open Controller Pak file: %s\n", strerror(errno));
       return -2;
     }
+
+    /* Write to Controller Pak */
     bytes_written = fwrite(&mailbox, 1, sizeof(mailbox), file);
     if (bytes_written != sizeof(mailbox))
     {
       fclose(file);
-      cpak_unmount(JOYPAD_PORT_1);
-      printf("Failed to write to Controller Pak file: %s\n", strerror(errno));
+      cpakfs_unmount(JOYPAD_PORT_1);
+      printf("%u bytes written to Controller Pak file: %s\n",
+        bytes_written, strerror(errno));
       return -3;
     }
     fclose(file);
 
-    cpak_get_stats(JOYPAD_PORT_1, &stats);
+    cpakfs_get_stats(JOYPAD_PORT_1, &stats);
     printf("Letter successfully saved to Controller Pak.\n");
     printf("Bytes written: %u\n", bytes_written);
     printf("Pages used: %i\n", stats.pages.used);
     printf("Notes used: %i\n", stats.notes.used);
-    cpak_unmount(JOYPAD_PORT_1);
+    cpakfs_unmount(JOYPAD_PORT_1);
 
     return 0;
   }
