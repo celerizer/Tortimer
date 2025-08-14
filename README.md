@@ -24,6 +24,9 @@ Virtually any NES ROM can be sent to the Controller Pak so long as there is spac
 
 This is a list of NES games that should fit on a standard Controller Pak. This list is not all-inclusive, and it does not guarantee the games will run correctly, just that they will fit:
 
+<details>
+  <summary>Click to view games list...</summary>
+  
 | Filename | Raw size | Compressed size | Needs compression |
 |----------|----------|-----------------|-----------|
 | 10-Yard Fight (USA, Europe) | 40976 (161 pages) | 19337 (76 pages) | ✔ |
@@ -155,3 +158,5 @@ This is a list of NES games that should fit on a standard Controller Pak. This l
 | Xevious - The Avenger (USA) | 40976 (161 pages) | 27686 (109 pages) | ✔ |
 | Yie Ar Kung-Fu (Japan) (Rev 1.4) | 24592 (97 pages) | 19141 (75 pages) | |
 | Zippy Race (Japan) | 24592 (97 pages) | 17270 (68 pages) | |
+
+</details>
