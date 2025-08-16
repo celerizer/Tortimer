@@ -8,7 +8,7 @@ In *Doubutsu no Mori*, players can obtain a special in-game *Disk System* furnit
 
 This project has two functions: it can send the *Disk System* item to the Controller Pak to be retrieved at the post office in-game, as well as generate Controller Pak notes containing NES ROMs using Nintendo's custom NESINFO header and Yay0 compression.
 
-# Usage
+## Usage
 
 1. Be sure you have progressed into *Doubutsu no Mori* to the point where your character's part time job is finished.
 2. Open Tortimer and select the option to send the Disk System letter data to your Controller Pak.
@@ -18,7 +18,7 @@ This project has two functions: it can send the *Disk System* item to the Contro
 
 From this point on, steps 4 and 5 can be repeated indefinitely so long as you keep the Disk System item.
 
-# Supported games
+## Supported games
 
 Virtually any NES ROM can be sent to the Controller Pak so long as there is space for it, though official Controller Paks only support ROMs that fit within 123 "pages." Tortimer supports Nintendo's Yay0 compression algorithm, which expands the number of possible supported games. Modified Controller Paks or the Ares emulator can be used play even larger NES ROMs.
 
