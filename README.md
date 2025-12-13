@@ -160,3 +160,11 @@ This is a list of NES games that should fit on a standard Controller Pak. This l
 | Zippy Race (Japan) | 24592 (97 pages) | 17270 (68 pages) | |
 
 </details>
+
+## Special thanks
+
+Hunter R. for contributing technical knowledge and creating an [interesting video](https://www.youtube.com/watch?v=0cpjhIS6ClI) that inspired the creation of this tool.
+
+## License
+
+**Tortimer** and [**yay0tool**](https://github.com/celerizer/yay0tool) are distributed under the MIT license. See LICENSE for information.
