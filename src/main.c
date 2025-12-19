@@ -54,7 +54,8 @@ int main(void)
   }
   debug_init_sdfs("sd:/", -1);
 
-  printf("Tortimer\n\n");
+  printf("Tortimer\n");
+  printf("WARNING: Usage will destroy all data on your Controller Pak!\n\n");
   printf("L: Write letter data to Pak\n");
   printf("R: Write sd:/nes/rom.nes to Pak\n");
   printf("B: Write sd:/nes/rom.nes to Pak without compression\n");

@@ -135,7 +135,16 @@ int pak_write_letter(void)
     printf("Critical error: mailbox structures aren't the right size!\n");
     return -1;
   }
-  else if (!cpakfs_mount(JOYPAD_PORT_1, "cpak1:/"))
+
+  if (cpakfs_format(JOYPAD_PORT_1, true))
+  {
+    printf("Failed to format Controller Pak: %s\n", strerror(errno));
+    return -1;
+  }
+  else
+    printf("Controller Pak formatted.\n");
+
+  if (!cpakfs_mount(JOYPAD_PORT_1, "cpak1:/"))
   {
     FILE *file;
     cpakfs_stats_t stats;
@@ -143,14 +152,6 @@ int pak_write_letter(void)
     size_t bytes_written;
     unsigned short checksum = 0;
     unsigned i;
-
-    if (cpakfs_format(JOYPAD_PORT_1, true))
-      printf("Failed to format Pak: %s\n", strerror(errno));
-    else
-    {
-      cpakfs_get_stats(JOYPAD_PORT_1, &stats);
-      printf("Pak formatted, %i pages available\n", stats.pages.total);
-    }
 
     /* Initialize mailbox */
     for (i = 1; i < sizeof(mailbox.letters) / sizeof(dnm_letter_t); i++)
@@ -166,7 +167,7 @@ int pak_write_letter(void)
     printf("Mailbox checksum: %04X\n", checksum);
 
     /* Open file on Controller Pak */
-    file = fopen("cpak1:/NAFJ.01/DOUBUTSUNOMORI.B", "wb");
+    file = fopen("cpak1:/NAFJ.01-DOUBUTSUNOMORI.B", "wb");
     if (!file)
     {
       cpakfs_unmount(JOYPAD_PORT_1);

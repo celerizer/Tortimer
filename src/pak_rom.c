@@ -314,6 +314,14 @@ int pak_write_rom(unsigned char *data, size_t size, const char *name,
 
   printf("Writing ROM data to Controller Pak: %s (%u bytes)\n", name, size);
 
+  if (cpakfs_format(JOYPAD_PORT_1, true))
+  {
+    printf("Failed to format Controller Pak: %s\n", strerror(errno));
+    return -1;
+  }
+  else
+    printf("Controller Pak formatted.\n");
+
   /* Compress the ROM if requested */
   if (compress)
   {
@@ -341,26 +349,13 @@ int pak_write_rom(unsigned char *data, size_t size, const char *name,
   if (!cpakfs_mount(JOYPAD_PORT_1, "cpak1:/"))
   {
     FILE *file;
-    cpakfs_stats_t stats;
     char filename[64], formatted_name[32];
     size_t bytes_written = 0;
-
-#if 1
-    if (cpakfs_format(JOYPAD_PORT_1, true))
-    {
-      printf("Failed to format Pak: %s\n", strerror(errno));
-      return -1;
-    }
-    else
-    {
-      cpakfs_get_stats(JOYPAD_PORT_1, &stats);
-      printf("Pak formatted, %i pages available\n", stats.pages.total);
-    }
-#endif
+    cpakfs_stats_t stats;
 
     /* Open Controller Pak file */
     cpn_format(formatted_name, name, strlen(name));
-    snprintf(filename, sizeof(filename), "cpak1:/NAFJ.01/%s", formatted_name);
+    snprintf(filename, sizeof(filename), "cpak1:/NAFJ.01-%s", formatted_name);
     file = fopen(filename, "wb");
     if (!file)
     {
