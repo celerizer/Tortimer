@@ -26,19 +26,19 @@ SD_CARD/
 
 <img width="320" height="240" alt="tortimer_letter" src="https://github.com/user-attachments/assets/ad8dfa53-36a3-4e71-8928-d33d2df721e4" />
 
-3. Open Tortimer and select the option to send the Disk System letter data to your Controller Pak.
+2. Open Tortimer and select the option to send the Disk System letter data to your Controller Pak.
 
 <img width="320" height="240" alt="Screenshot_20251218_190251" src="https://github.com/user-attachments/assets/7a21e102-1540-4b0e-addf-e73ebd453e96" />
 
-4. Return to *Doubutsu no Mori* and visit the post office. Choose the third option to open letter data from the Controller Pak. The letter within should contain the Disk System item which can be placed in your house.
+3. Return to *Doubutsu no Mori* and visit the post office. Choose the third option to open letter data from the Controller Pak. The letter within should contain the Disk System item which can be placed in your house.
 
 <img width="320" height="240" alt="tortimer_rom" src="https://github.com/user-attachments/assets/f3412ed2-45b5-4c03-bb08-1c4c2197d92a" />
 
-6. Open Tortimer and select an NES ROM to send to the Controller Pak.
+4. Open Tortimer and select an NES ROM to send to the Controller Pak.
 
 <img width="320" height="240" alt="Screenshot_20251218_190405" src="https://github.com/user-attachments/assets/567531c5-3c69-4f8b-90d6-b72024280569" />
 
-7. Return to *Doubutsu no Mori* and interact with the Disk System item in your house. The game should find the NES ROM on your Controller Pak and ask if you would like to play it.
+5. Return to *Doubutsu no Mori* and interact with the Disk System item in your house. The game should find the NES ROM on your Controller Pak and ask if you would like to play it.
 
 From this point on, steps 4 and 5 can be repeated indefinitely so long as you keep the Disk System item.
 
